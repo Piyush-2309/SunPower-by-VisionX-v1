@@ -679,6 +679,24 @@ export function scheduleInstallation(
           "INVALID_DATES",
           "Expected completion must be after the start date.",
         )
+      for (const member of input.crew) {
+        const dateStr = input.scheduledAt.slice(0, 10)
+        const conflict = db.installations.find(
+          (other) =>
+            other.id !== id &&
+            ["Scheduled", "In Progress"].includes(other.status) &&
+            other.scheduledAt &&
+            other.scheduledAt.slice(0, 10) === dateStr &&
+            other.crew.some((c) => c.technicianId === member.technicianId),
+        )
+        if (conflict) {
+          const techName = byId(db.users, member.technicianId)?.name ?? member.technicianId
+          rule(
+            "CREW_DOUBLE_BOOKED",
+            `Technician ${techName} is already assigned to ${conflict.reference} on this date.`,
+          )
+        }
+      }
       inst.scheduledAt = input.scheduledAt
       inst.expectedCompletion = input.expectedCompletion
       inst.crew = input.crew

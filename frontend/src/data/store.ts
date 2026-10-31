@@ -32,10 +32,12 @@ function emptyDb(): DemoDB {
 function loadDb(): DemoDB {
   if (!isDemoMode) return emptyDb()
   try {
-    const raw = localStorage.getItem(DB_KEY)
-    if (raw) {
-      const parsed = JSON.parse(raw) as DemoDB
-      if (parsed.version === DB_VERSION) return parsed
+    if (typeof localStorage !== "undefined") {
+      const raw = localStorage.getItem(DB_KEY)
+      if (raw) {
+        const parsed = JSON.parse(raw) as DemoDB
+        if (parsed.version === DB_VERSION) return parsed
+      }
     }
   } catch {
     /* corrupted cache — fall back to a fresh seed */
@@ -51,9 +53,11 @@ let storageWarned = false
 function persist() {
   if (!isDemoMode) return
   try {
-    localStorage.setItem(DB_KEY, JSON.stringify(db))
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(DB_KEY, JSON.stringify(db))
+    }
   } catch {
-    if (!storageWarned) {
+    if (!storageWarned && typeof window !== "undefined") {
       storageWarned = true
       window.dispatchEvent(new CustomEvent("sunflow:storage-full"))
     }
@@ -95,9 +99,12 @@ export const useDb = () => useSyncExternalStore(subscribe, getDb)
 
 let session: Session | null = (() => {
   try {
-    return JSON.parse(
-      localStorage.getItem(SESSION_KEY) ?? "null",
-    ) as Session | null
+    if (typeof localStorage !== "undefined") {
+      return JSON.parse(
+        localStorage.getItem(SESSION_KEY) ?? "null",
+      ) as Session | null
+    }
+    return null
   } catch {
     return null
   }
@@ -107,8 +114,10 @@ const sessionListeners = new Set<() => void>()
 export const getSession = () => session
 export function setSession(next: Session | null) {
   session = next
-  if (next) localStorage.setItem(SESSION_KEY, JSON.stringify(next))
-  else localStorage.removeItem(SESSION_KEY)
+  if (typeof localStorage !== "undefined") {
+    if (next) localStorage.setItem(SESSION_KEY, JSON.stringify(next))
+    else localStorage.removeItem(SESSION_KEY)
+  }
   sessionListeners.forEach((l) => l())
 }
 export const useSession = () =>
