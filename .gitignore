@@ -1,0 +1,53 @@
+# ========================
+# SunFlow 360 - .gitignore
+# ========================
+
+# --- Environment & Secrets ---
+.env
+.env.local
+.env.*.local
+
+# --- Java / Maven ---
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+hs_err_pid*
+
+# --- Spring Boot ---
+application-local.yml
+application-local.properties
+
+# --- Node / npm ---
+node_modules/
+dist/
+*.tsbuildinfo
+
+# --- Vite ---
+sunflow-ui/dist/
+
+# --- IDE ---
+.idea/
+*.iml
+*.iws
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+.factorypath
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# --- Misc ---
+*.bak
+*.tmp
+*.orig
